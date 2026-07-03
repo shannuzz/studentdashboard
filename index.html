@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduHub - Student Productivity & Learning Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --container-bg: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header-title p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .quick-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 20px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .stat-card .val {
+            font-size: 20px;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-card .lbl {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Main Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background-color: var(--container-bg);
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 10px;
+        }
+
+        /* Input Elements */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-muted);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Pomodoro Timer Specifics */
+        .timer-display {
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            font-family: monospace;
+            color: var(--text-main);
+            background: var(--bg-color);
+            padding: 15px;
+            border-radius: 8px;
+            letter-spacing: 2px;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-success { background-color: var(--success); }
+        .btn-success:hover { background-color: #059669; }
+        .btn-danger { background-color: var(--danger); }
+        .btn-danger:hover { background-color: #dc2626; }
+
+        /* To-Do List Specifics */
+        .list-container {
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: var(--bg-color);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .list-item.completed span {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* GPA Calculator Specifics */
+        .gpa-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .gpa-row input { flex: 2; }
+        .gpa-row select { flex: 1; }
+
+        .gpa-result {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: rgba(79, 70, 229, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+    <header>
+        <div class="header-title">
+            <h1>EduHub Central</h1>
+            <p>Your ultimate workspace for tasks, focus, and academic track progress</p>
+        </div>
+        <div class="quick-stats">
+            <div class="stat-card">
+                <span class="val" id="stat-tasks">0</span>
+                <span class="lbl">Pending Tasks</span>
+            </div>
+            <div class="stat-card">
+                <span class="val" id="stat-gpa">0.00</span>
+                <span class="lbl">Current GPA</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <h2>⏱️ Focus Timer (Pomodoro)</h2>
+            <div class="timer-display" id="timer-label">25:00</div>
+            <div class="timer-controls">
+                <button class="btn btn-success" id="btn-start" onclick="toggleTimer()">Start</button>
+                <button class="btn btn-danger" id="btn-reset" onclick="resetTimer()">Reset</button>
+            </div>
+            <div style="margin-top: 15px; text-align: center; font-size: 12px; color: var(--text-muted);">
+                Boost your retention using 25-minute sprints followed by a 5-minute breather.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📝 Task & Assignment Planner</h2>
+            <div class="form-group" style="display: flex; gap: 8px; margin-bottom: 0;">
+                <input type="text" id="task-input" placeholder="Enter assignment or task title...">
+                <button class="btn" style="width: auto; white-space: nowrap;" onclick="addTask()">Add Task</button>
+            </div>
+            <div class="list-container" id="task-list">
+                </div>
+        </div>
+
+        <div class="card">
+            <h2>📊 Quick Grade & GPA Tracker</h2>
+            <div id="gpa-rows-container">
+                <div class="gpa-row">
+                    <input type="text" placeholder="Subject Name (e.g., Math)" class="sub-name">
+                    <select class="sub-grade">
+                        <option value="4.0">A (4.0)</option>
+                        <option value="3.5">B+ (3.5)</option>
+                        <option value="3.0">B (3.0)</option>
+                        <option value="2.5">C+ (2.5)</option>
+                        <option value="2.0">C (2.0)</option>
+                        <option value="0.0">F (0.0)</option>
+                    </select>
+                </div>
+                <div class="gpa-row">
+                    <input type="text" placeholder="Subject Name (e.g., Physics)" class="sub-name">
+                    <select class="sub-grade">
+                        <option value="4.0">A (4.0)</option>
+                        <option value="3.5">B+ (3.5)</option>
+                        <option value="3.0">B (3.0)</option>
+                        <option value="2.5">C+ (2.5)</option>
+                        <option value="2.0">C (2.0)</option>
+                        <option value="0.0">F (0.0)</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn" style="background-color: transparent; color: var(--primary); border: 1px dashed var(--primary); margin-bottom: 10px;" onclick="addGpaRow()">+ Add Course Row</button>
+            <button class="btn" onclick="calculateGPA()">Compute Cumulative GPA</button>
+            <div class="gpa-result" id="gpa-output">GPA Status: Not Calculated Yet</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- POMODORO TIMER ENGINE ---
+    let timerInterval = null;
+    let timeRemaining = 25 * 60; // 25 mins in seconds
+    let isRunning = false;
+
+    function updateTimerDisplay() {
+        const mins = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+        const secs = (timeRemaining % 60).toString().padStart(2, '0');
+        document.getElementById('timer-label').innerText = `${mins}:${secs}`;
+    }
+
+    function toggleTimer() {
+        const startBtn = document.getElementById('btn-start');
+        if (!isRunning) {
+            isRunning = true;
+            startBtn.innerText = "Pause";
+            startBtn.style.backgroundColor = "#f59e0b"; // warning color
+            timerInterval = setInterval(() => {
+                if (timeRemaining > 0) {
+                    timeRemaining--;
+                    updateTimerDisplay();
+                } else {
+                    clearInterval(timerInterval);
+                    alert("Focus session complete! Time to take a short break.");
+                    resetTimer();
+                }
+            }, 1000);
+        } else {
+            isRunning = false;
+            startBtn.innerText = "Resume";
+            startBtn.style.backgroundColor = "var(--success)";
+            clearInterval(timerInterval);
+        }
+    }
+
+    function resetTimer() {
+        clearInterval(timerInterval);
+        isRunning = false;
+        timeRemaining = 25 * 60;
+        updateTimerDisplay();
+        const startBtn = document.getElementById('btn-start');
+        startBtn.innerText = "Start";
+        startBtn.style.backgroundColor = "var(--success)";
+    }
+
+    // --- TASK PLANNER ENGINE ---
+    let tasks = [
+        { id: 1, title: 'Revise notes', completed: false },
+        { id: 2, title: 'Complete lab project report', completed: true }
+    ];
+
+    function renderTasks() {
+        const listContainer = document.getElementById('task-list');
+        listContainer.innerHTML = '';
+        
+        let pendingCount = 0;
+        
+        tasks.forEach(task => {
+            if(!task.completed) pendingCount++;
+
+            const div = document.createElement('div');
+            div.className = `list-item ${task.completed ? 'completed' : ''}`;
+            
+            div.innerHTML = `
+                <span>${task.title}</span>
+                <div class="actions">
+                    <button class="action-btn" onclick="toggleTask(${task.id})">${task.completed ? '🔄' : '✅'}</button>
+                    <button class="action-btn" onclick="deleteTask(${task.id})">❌</button>
+                </div>
+            `;
+            listContainer.appendChild(div);
+        });
+
+        document.getElementById('stat-tasks').innerText = pendingCount;
+    }
+
+    function addTask() {
+        const input = document.getElementById('task-input');
+        if (!input.value.trim()) return;
+
+        const newTask = {
+            id: Date.now(),
+            title: input.value.trim(),
+            completed: false
+        };
+        tasks.push(newTask);
+        input.value = '';
+        renderTasks();
+    }
+
+    function toggleTask(id) {
+        tasks = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+        renderTasks();
+    }
+
+    function deleteTask(id) {
+        tasks = tasks.filter(t => t.id !== id);
+        renderTasks();
+    }
+
+    // --- GPA TRACKER ENGINE ---
+    function addGpaRow() {
+        const container = document.getElementById('gpa-rows-container');
+        const row = document.createElement('div');
+        row.className = 'gpa-row';
+        row.innerHTML = `
+            <input type="text" placeholder="Subject Name" class="sub-name">
+            <select class="sub-grade">
+                <option value="4.0">A (4.0)</option>
+                <option value="3.5">B+ (3.5)</option>
+                <option value="3.0">B (3.0)</option>
+                <option value="2.5">C+ (2.5)</option>
+                <option value="2.0">C (2.0)</option>
+                <option value="0.0">F (0.0)</option>
+            </select>
+        `;
+        container.appendChild(row);
+    }
+
+    function calculateGPA() {
+        const grades = document.querySelectorAll('.sub-grade');
+        let totalPoints = 0;
+        let validCourses = 0;
+
+        grades.forEach(gradeSelect => {
+            totalPoints += parseFloat(gradeSelect.value);
+            validCourses++;
+        });
+
+        const gpa = validCourses > 0 ? (totalPoints / validCourses).toFixed(2) : 0.00;
+        document.getElementById('gpa-output').innerText = `Estimated GPA: ${gpa} / 4.00`;
+        document.getElementById('stat-gpa').innerText = gpa;
+    }
+
+    // Initialize Workspace elements on load
+    window.onload = function() {
+        renderTasks();
+    };
+</script>
+
+</body>
+</html>
